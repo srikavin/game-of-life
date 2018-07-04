@@ -1,7 +1,6 @@
 const simulation_time = 1500; //Max simulation time in ms
 
 function main() {
-    const gameContainer = document.getElementById('container');
     const gameElement = document.getElementById('game');
     const context = gameElement.getContext('2d');
 
@@ -12,6 +11,15 @@ function main() {
     let board = createArray([]);
     let status = 'paused';
     let iteration = 0;
+
+    (function () {
+        let heldDown = false;
+        gameElement.onmousedown = () => heldDown = true;
+        gameElement.onmouseup = () => heldDown = false;
+        gameElement.onmousemove = (e) => {
+            heldDown && processClick(context, e.layerX, e.layerY)
+        }
+    })();
 
     document.getElementById('pause').onclick = () => {
         status = 'paused';
@@ -35,10 +43,7 @@ function main() {
         document.getElementById('sizeValue').innerHTML = val;
     };
 
-
-    gameElement.onclick = function (event) {
-        processClick(context, event.layerX, event.layerY);
-    };
+    document.getElementById('size').onchange = handleSizing;
 
     function processClick(context, x, y) {
         let boardX = Math.floor(x / tile_size);
@@ -75,10 +80,8 @@ function main() {
     }
 
     function handleSizing() {
-        if (gameElement.width !== gameContainer.offsetWidth || gameElement.height !== gameContainer.offsetHeight) {
-            gameElement.width = gameContainer.offsetWidth;
-            gameElement.height = gameContainer.offsetHeight;
-        }
+        gameElement.width = board_size * tile_size;
+        gameElement.height = board_size * tile_size;
     }
 
     function draw() {
