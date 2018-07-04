@@ -23,6 +23,8 @@ body {
 #settings {
     width: 95vw;
     text-align: center;
+    margin-left: 2.5vw;
+    margin-right: 2.5vw;
 }
 
 #settings > * {
