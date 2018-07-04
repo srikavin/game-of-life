@@ -1,11 +1,40 @@
-const board_size = 25;
-
-let tile_size = 10;
+const simulation_time = 1500; //Max simulation time in ms
 
 function main() {
+    const gameContainer = document.getElementById('container');
     const gameElement = document.getElementById('game');
     const context = gameElement.getContext('2d');
+
+    let board_size = 25;
+    let tile_size = 10;
+    let speed = 1;
+
     let board = createArray([]);
+    let status = 'paused';
+    let iteration = 0;
+
+    document.getElementById('pause').onclick = () => {
+        status = 'paused';
+        document.getElementById('pause').disabled = true;
+        document.getElementById('start').disabled = false;
+    };
+    document.getElementById('start').onclick = () => {
+        status = 'playing';
+        document.getElementById('pause').disabled = false;
+        document.getElementById('start').disabled = true;
+    };
+    document.getElementById('speed').oninput = () => {
+        let val = document.getElementById('speed').value;
+        speed = val;
+        document.getElementById('speedValue').innerHTML = val;
+    };
+    document.getElementById('size').oninput = () => {
+        let val = document.getElementById('size').value;
+        board = createArray(board, val);
+        board_size = val;
+        document.getElementById('sizeValue').innerHTML = val;
+    };
+
 
     gameElement.onclick = function (event) {
         processClick(context, event.layerX, event.layerY);
@@ -19,11 +48,12 @@ function main() {
         context.fillRect(boardX * tile_size, boardY * tile_size, tile_size, tile_size);
     }
 
-    function createArray(previous) {
+    function createArray(previous, size) {
+        let bSize = size || board_size;
         let array = [];
-        for (let i = 0; i < board_size; i++) {
+        for (let i = 0; i < bSize; i++) {
             let inner = [];
-            for (let j = 0; j < board_size; j++) {
+            for (let j = 0; j < bSize; j++) {
                 if (i in previous && j in previous[i]) {
                     inner.push(previous[i][j]);
                 } else {
@@ -36,11 +66,20 @@ function main() {
     }
 
     function requestDraw() {
-        simulate();
+        if (status === 'playing') {
+            simulate();
+        }
+        handleSizing();
         draw(board, context);
-        setTimeout(requestDraw, 1500);
+        setTimeout(requestDraw, simulation_time / speed);
     }
 
+    function handleSizing() {
+        if (gameElement.width !== gameContainer.offsetWidth || gameElement.height !== gameContainer.offsetHeight) {
+            gameElement.width = gameContainer.offsetWidth;
+            gameElement.height = gameContainer.offsetHeight;
+        }
+    }
 
     function draw() {
         context.clearRect(0, 0, board_size * tile_size, board_size * tile_size);
@@ -52,9 +91,11 @@ function main() {
                 }
             }
         }
+        document.getElementById('iteration').innerHTML = iteration.toLocaleString();
     }
 
     function simulate() {
+        iteration++;
         const prevBoard = createArray(board);
 
         function countNeighbors(x, y) {

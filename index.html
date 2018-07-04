@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conway's Game of Lie</title>
+    <title>Conway's Game of Life</title>
 </head>
 <body>
-<canvas width="250px" height="250px" id="game">
-</canvas>
+<div id="container" style="width: 90vw; height:90vh">
+    <canvas id="game">
+    </canvas>
+</div>
+<br>
+<button id="start">Start</button>
+<button id="pause">Pause</button>
+<br>
+<label for="speed">Speed: <span id="speedValue">1</span>x</label><br>
+<input id="speed" type="range" min="0.1" max="100" value="1">
+<br>
+<label for="size">Size: <span id="sizeValue">1</span><sup>2</sup></label><br>
+<input id="size" type="range" min="1" max="1000" value="25">
+<br>
+<h3>Iteration: <span id="iteration">0</span></h3>
 <script src="main.js"></script>
 </body>
 </html>
