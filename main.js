@@ -1,4 +1,4 @@
-const simulation_time = 1500; //Max simulation time in ms
+const simulation_time = 1000; //Max simulation time in ms
 
 function main() {
     const gameElement = document.getElementById('game');
@@ -38,6 +38,8 @@ function main() {
         let val = document.getElementById('speed').value;
         speed = val;
         document.getElementById('speedValue').innerHTML = val;
+        clearTimeout(simulateTimeout);
+        requestSimulate();
     };
     document.getElementById('size').oninput = () => {
         let val = document.getElementById('size').value;
@@ -53,7 +55,6 @@ function main() {
         let boardY = Math.floor(y / tile_size);
 
         board[boardX][boardY] = true;
-        context.fillRect(boardX * tile_size, boardY * tile_size, tile_size, tile_size);
     }
 
     function createArray(previous, size) {
@@ -74,12 +75,18 @@ function main() {
     }
 
     function requestDraw() {
+        handleSizing();
+        draw(board, context);
+        requestAnimationFrame(requestDraw);
+    }
+
+    let simulateTimeout = 0;
+
+    function requestSimulate() {
         if (status === 'playing') {
             simulate();
         }
-        handleSizing();
-        draw(board, context);
-        setTimeout(requestDraw, simulation_time / speed);
+        simulateTimeout = setTimeout(requestSimulate, simulation_time / speed);
     }
 
     function handleSizing() {
@@ -95,6 +102,8 @@ function main() {
                     context.fillStyle = 'black';
                     context.fillRect(i * tile_size, j * tile_size, tile_size, tile_size);
                 }
+                context.strokeStyle = '#D6D8D8';
+                context.strokeRect(i * tile_size, j * tile_size, tile_size, tile_size);
             }
         }
         document.getElementById('iteration').innerHTML = iteration.toLocaleString();
@@ -149,6 +158,7 @@ function main() {
     }
 
     requestDraw();
+    requestSimulate();
 }
 
 main();
