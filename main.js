@@ -38,8 +38,7 @@ function main() {
         let val = document.getElementById('speed').value;
         speed = val;
         document.getElementById('speedValue').innerHTML = val;
-        clearTimeout(simulateTimeout);
-        requestSimulate();
+        simulation_speed = simulation_time / speed;
     };
     document.getElementById('size').oninput = () => {
         let val = document.getElementById('size').value;
@@ -54,6 +53,9 @@ function main() {
         let boardX = Math.floor(x / tile_size);
         let boardY = Math.floor(y / tile_size);
 
+        console.log(board);
+        console.log(boardX);
+        console.log(boardY);
         board[boardX][boardY] = true;
     }
 
@@ -74,20 +76,23 @@ function main() {
         return array;
     }
 
-    function requestDraw() {
+    function requestDraw(timestamp) {
         handleSizing();
         draw(board, context);
         requestAnimationFrame(requestDraw);
-    }
 
-    let simulateTimeout = 0;
-
-    function requestSimulate() {
         if (status === 'playing') {
-            simulate();
+            if (lastSimulate + simulation_speed <= timestamp) {
+                lastSimulate = timestamp;
+                simulate()
+            }
+            nextFrame.value = (timestamp - lastSimulate) / simulation_speed * 100;
         }
-        simulateTimeout = setTimeout(requestSimulate, simulation_time / speed);
     }
+
+    let lastSimulate = 0;
+    let simulation_speed = simulation_time / speed;
+    let nextFrame = document.getElementById("nextFrame");
 
     function handleSizing() {
         gameElement.width = board_size * tile_size;
@@ -158,7 +163,6 @@ function main() {
     }
 
     requestDraw();
-    requestSimulate();
 }
 
 main();
