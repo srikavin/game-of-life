@@ -18,6 +18,9 @@ function main() {
         gameElement.onmouseup = () => heldDown = false;
         gameElement.onmousemove = (e) => {
             heldDown && processClick(context, e.layerX, e.layerY)
+        };
+        gameElement.onclick = (e) => {
+            processClick(context, e.layerX, e.layerY)
         }
     })();
 
